@@ -1,0 +1,8 @@
+{
+  "name": "FridgeChef AI",
+  "description": "A smart culinary assistant that analyzes your fridge ingredients to suggest personalized recipes with step-by-step voice guidance.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
