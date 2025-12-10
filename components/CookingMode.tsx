@@ -6,9 +6,17 @@ interface CookingModeProps {
   recipe: Recipe;
   onClose: () => void;
   onAddToShoppingList: (items: Ingredient[]) => void;
+  rating: number;
+  onRate: (rating: number) => void;
 }
 
-const CookingMode: React.FC<CookingModeProps> = ({ recipe, onClose, onAddToShoppingList }) => {
+const CookingMode: React.FC<CookingModeProps> = ({ 
+  recipe, 
+  onClose, 
+  onAddToShoppingList, 
+  rating, 
+  onRate 
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
@@ -81,15 +89,30 @@ const CookingMode: React.FC<CookingModeProps> = ({ recipe, onClose, onAddToShopp
         <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
           <Icons.ArrowLeft size={24} />
         </button>
-        <div className="text-center">
-          <h2 className="font-bold text-gray-800 truncate max-w-[200px] md:max-w-md">
+        <div className="text-center flex-1 mx-2 overflow-hidden">
+          <h2 className="font-bold text-gray-800 truncate">
             {recipe.title}
           </h2>
           <span className="text-xs text-gray-500">
             {currentStep === -1 ? 'Prep' : `Step ${currentStep + 1} of ${recipe.steps.length}`}
           </span>
         </div>
-        <div className="w-10"></div>
+        
+        {/* Rating System */}
+        <div className="flex gap-0.5">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button 
+              key={star} 
+              onClick={() => onRate(star)}
+              className="p-1"
+            >
+              <Icons.Star 
+                size={18} 
+                className={star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"} 
+              />
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Content Area */}

@@ -15,6 +15,10 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('shoppingList');
     return saved ? JSON.parse(saved) : [];
   });
+  const [ratings, setRatings] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('recipeRatings');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [activeRecipe, setActiveRecipe] = useState<Recipe | null>(null);
   const [activeFilters, setActiveFilters] = useState<DietaryFilter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +27,11 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
   }, [shoppingList]);
+
+  // Persist ratings
+  useEffect(() => {
+    localStorage.setItem('recipeRatings', JSON.stringify(ratings));
+  }, [ratings]);
 
   const handleImageCapture = async (base64: string, mimeType: string) => {
     setIsLoading(true);
@@ -64,6 +73,12 @@ const App: React.FC = () => {
     setShoppingList(prev => prev.filter(item => !item.checked));
   };
 
+  const handleRateRecipe = (rating: number) => {
+    if (activeRecipe) {
+      setRatings(prev => ({ ...prev, [activeRecipe.title]: rating }));
+    }
+  };
+
   // --- Render Logic ---
 
   if (currentView === AppView.CAMERA) {
@@ -81,6 +96,8 @@ const App: React.FC = () => {
         recipe={activeRecipe} 
         onClose={() => setActiveRecipe(null)}
         onAddToShoppingList={handleAddToShoppingList}
+        rating={ratings[activeRecipe.title] || 0}
+        onRate={handleRateRecipe}
       />
     );
   }
@@ -137,6 +154,7 @@ const App: React.FC = () => {
               prev.includes(f) ? prev.filter(i => i !== f) : [...prev, f]
             )}
             onSelectRecipe={setActiveRecipe}
+            ratings={ratings}
           />
         )}
 
@@ -151,7 +169,7 @@ const App: React.FC = () => {
       </main>
 
       {/* Bottom Navigation */}
-      {!activeRecipe && currentView !== AppView.HOME && (
+      {(currentView === AppView.RECIPES || currentView === AppView.SHOPPING) && (
         <nav className="bg-white border-t border-gray-200 h-20 flex justify-around items-center px-6 shrink-0 z-30">
           <button 
             onClick={() => setCurrentView(AppView.HOME)}

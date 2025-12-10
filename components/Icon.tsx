@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   Camera, ChefHat, ShoppingCart, ArrowLeft, Clock, Flame, 
   Leaf, AlertCircle, Play, Pause, ChevronRight, ChevronLeft,
-  Check, Plus, Trash2, Mic, Volume2, X
+  Check, Plus, Trash2, Mic, Volume2, X, Star
 } from 'lucide-react';
 
 export const Icons = {
@@ -23,5 +23,6 @@ export const Icons = {
   Trash2,
   Mic,
   Volume2,
-  X
+  X,
+  Star
 };

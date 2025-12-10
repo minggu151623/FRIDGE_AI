@@ -8,6 +8,7 @@ interface RecipeListProps {
   activeFilters: DietaryFilter[];
   onToggleFilter: (filter: DietaryFilter) => void;
   onSelectRecipe: (recipe: Recipe) => void;
+  ratings: Record<string, number>;
 }
 
 const AVAILABLE_FILTERS: DietaryFilter[] = [
@@ -19,7 +20,8 @@ const RecipeList: React.FC<RecipeListProps> = ({
   detectedIngredients, 
   activeFilters, 
   onToggleFilter,
-  onSelectRecipe 
+  onSelectRecipe,
+  ratings
 }) => {
   
   // Note: Filtering logic could be server-side or client-side. 
@@ -84,60 +86,70 @@ const RecipeList: React.FC<RecipeListProps> = ({
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-              {filteredRecipes.map(recipe => (
-                <div 
-                  key={recipe.id}
-                  onClick={() => onSelectRecipe(recipe)}
-                  className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100 overflow-hidden flex flex-col"
-                >
-                  <div className="h-32 bg-gradient-to-r from-chef-500 to-emerald-400 relative">
-                     <div className="absolute bottom-0 left-0 p-4 w-full bg-gradient-to-t from-black/60 to-transparent">
-                       <h3 className="text-white font-bold text-xl truncate">{recipe.title}</h3>
-                     </div>
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col">
-                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Icons.Clock size={16} />
-                        {recipe.prepTime}
+              {filteredRecipes.map(recipe => {
+                const userRating = ratings[recipe.title] || 0;
+                return (
+                  <div 
+                    key={recipe.id}
+                    onClick={() => onSelectRecipe(recipe)}
+                    className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-100 overflow-hidden flex flex-col relative"
+                  >
+                    <div className="h-32 bg-gradient-to-r from-chef-500 to-emerald-400 relative">
+                      <div className="absolute bottom-0 left-0 p-4 w-full bg-gradient-to-t from-black/60 to-transparent">
+                        <h3 className="text-white font-bold text-xl truncate pr-8">{recipe.title}</h3>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Icons.Flame size={16} />
-                        {recipe.calories} kcal
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1">
-                      {recipe.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {recipe.dietaryTags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className={`
-                        text-xs font-semibold px-2 py-1 rounded
-                        ${recipe.difficulty === 'Easy' ? 'bg-green-100 text-green-700' : 
-                          recipe.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
-                          'bg-red-100 text-red-700'}
-                      `}>
-                        {recipe.difficulty}
-                      </span>
-                      {recipe.ingredients.some(i => i.isMissing) && (
-                        <span className="text-xs text-orange-500 font-medium flex items-center gap-1">
-                          <Icons.AlertCircle size={12} />
-                          Missing Items
-                        </span>
+                      
+                      {userRating > 0 && (
+                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-full flex items-center gap-1 shadow-sm z-10">
+                          <Icons.Star size={12} className="text-yellow-400 fill-yellow-400" />
+                          <span className="text-xs font-bold text-gray-700">{userRating}</span>
+                        </div>
                       )}
                     </div>
+                    <div className="p-4 flex-1 flex flex-col">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center gap-1">
+                          <Icons.Clock size={16} />
+                          {recipe.prepTime}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Icons.Flame size={16} />
+                          {recipe.calories} kcal
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-1">
+                        {recipe.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {recipe.dietaryTags.slice(0, 3).map(tag => (
+                          <span key={tag} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className={`
+                          text-xs font-semibold px-2 py-1 rounded
+                          ${recipe.difficulty === 'Easy' ? 'bg-green-100 text-green-700' : 
+                            recipe.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
+                            'bg-red-100 text-red-700'}
+                        `}>
+                          {recipe.difficulty}
+                        </span>
+                        {recipe.ingredients.some(i => i.isMissing) && (
+                          <span className="text-xs text-orange-500 font-medium flex items-center gap-1">
+                            <Icons.AlertCircle size={12} />
+                            Missing Items
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
